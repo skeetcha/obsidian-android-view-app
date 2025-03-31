@@ -119,7 +119,7 @@ func (o *ObsidianApp) Run(window *app.Window) error {
 					ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 					defer cancel()
 					o.wsCtx = ctx
-					c, _, err := websocket.Dial(ctx, "ws://"+o.url+":8080", &websocket.DialOptions{
+					c, _, err := websocket.Dial(ctx, "ws://"+o.url+":8765", &websocket.DialOptions{
 						Subprotocols: []string{"send"},
 					})
 
