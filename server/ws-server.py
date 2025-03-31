@@ -1,14 +1,27 @@
 import asyncio
 from websockets.asyncio.server import serve
-import time
+from websockets import broadcast
 
-async def send(websocket):
-    await websocket.send('test message')
-    time.sleep(5)
+connected_clients = set()
+
+async def handler(websocket):
+    connected_clients.add(websocket)
+
+    try:
+        async for _ in websocket:
+            pass # Keep the connection open
+    finally:
+        connected_clients.remove(websocket)
+
+async def send_messages():
+    while True:
+        await asyncio.sleep(5)
+        broadcast(connected_clients, 'test message')
+        print('Sent')
 
 async def main():
-    async with serve(send, 'localhost', 8765) as server:
-        await server.serve_forever()
+    server = await serve(handler, 'localhost', 8765)
+    await asyncio.gather(server.wait_closed(), send_messages())
 
 if __name__ == '__main__':
     asyncio.run(main())
